@@ -10,16 +10,38 @@
         function computerPlay() {
 
             function getRandomInteger(min, max) {
-                return Math.floor(Math.random() * (max - min +1) ) + min; //This function returns a random number between min and max (inclusive).
+                return Math.floor(Math.random() * (max - min) +1) + min; //This function returns a random number between min and max (inclusive).
             }
 
-            if (getRandomInteger(1, 9999) <= 3333) {
+            const randomNumber = getRandomInteger(1, 9999)
+
+            if (randomNumber <= 3333) {
                 return "Rock" //RNG resulting in 1-3333 (3333 total) results in Rock.;
-            } else if (getRandomInteger(1, 9999) >= 6667) {
+            } else if (randomNumber >= 5000) {
                 return "Paper" //RNG resulting in 6667-9999 (3333 total) results in Paper.
             } else {
                 return "Scissors" //RNG resulting in 3334-6666 (3333 total) results in Scissors.
             }
+        }
+
+        //Test RNG
+        function testComputerPlay(numberOfRolls) {
+
+            let numberOfRock = 0
+            let numberOfPaper = 0
+            let numberOfScissors = 0
+
+            for (i = 0; i < numberOfRolls; i++) {
+                if (computerPlay() === "Rock") {
+                    numberOfRock += 1;
+                } else if (computerPlay() === "Paper") {
+                    numberOfPaper += 1;
+                } else {
+                    numberOfScissors += 1;
+                }
+            }
+
+            return "Rock: " + numberOfRock + ". Paper:" + numberOfPaper + ". Scissors:" + numberOfScissors + ".";
         }
 
         //Plays a single round of Rock Paper Scissors.
@@ -46,7 +68,7 @@
                     return "You Win! Paper beats Rock." //Paper wins against Rock.
                 }
                 
-            } else if (playerSelection === "scissors") {
+            } else { //Player selects scissors.
                 if (computerSelection === "scissors") {
                     return "Tie! Go again!" //Scissors ties to Scissors.
                 } else if (computerSelection === "rock") {
@@ -80,7 +102,8 @@
                 playerScore += 0; //If tied, neither the player nor computer gets a point.
             } else if (playRound(playerSelection2, computerPlay()) === "You Win! Rock beats Scissors."
                     || playRound(playerSelection2, computerPlay()) === "You Win! Paper beats Rock."
-                    || playRound(playerSelection2, computerPlay()) === "You Win! Scissors beats Paper.") {                playerScore += 1; //If player wins, player gets a point. There needs to be a better way to return win/loss values...
+                    || playRound(playerSelection2, computerPlay()) === "You Win! Scissors beats Paper.") {
+                playerScore += 1; //If player wins, player gets a point.
             } else {
                 computerScore += 1; //If computer wins, computer gets a point.
             }
@@ -90,7 +113,8 @@
                 playerScore += 0; //If tied, neither the player nor computer gets a point.
             } else if (playRound(playerSelection3, computerPlay()) === "You Win! Rock beats Scissors."
                     || playRound(playerSelection3, computerPlay()) === "You Win! Paper beats Rock."
-                    || playRound(playerSelection3, computerPlay()) === "You Win! Scissors beats Paper.") {                playerScore += 1; //If player wins, player gets a point. There needs to be a better way to return win/loss values...
+                    || playRound(playerSelection3, computerPlay()) === "You Win! Scissors beats Paper.") {
+                playerScore += 1; //If player wins, player gets a point.
             } else {
                 computerScore += 1; //If computer wins, computer gets a point.
             }
@@ -100,7 +124,8 @@
                 playerScore += 0; //If tied, neither the player nor computer gets a point.
             } else if (playRound(playerSelection4, computerPlay()) === "You Win! Rock beats Scissors."
                     || playRound(playerSelection4, computerPlay()) === "You Win! Paper beats Rock."
-                    || playRound(playerSelection4, computerPlay()) === "You Win! Scissors beats Paper.") {                playerScore += 1; //If player wins, player gets a point. There needs to be a better way to return win/loss values...
+                    || playRound(playerSelection4, computerPlay()) === "You Win! Scissors beats Paper.") {
+                playerScore += 1; //If player wins, player gets a point.
             } else {
                 computerScore += 1; //If computer wins, computer gets a point.
             }
@@ -110,7 +135,8 @@
                 playerScore += 0; //If tied, neither the player nor computer gets a point.
             } else if (playRound(playerSelection5, computerPlay()) === "You Win! Rock beats Scissors."
                     || playRound(playerSelection5, computerPlay()) === "You Win! Paper beats Rock."
-                    || playRound(playerSelection5, computerPlay()) === "You Win! Scissors beats Paper.") {                playerScore += 1; //If player wins, player gets a point. There needs to be a better way to return win/loss values...
+                    || playRound(playerSelection5, computerPlay()) === "You Win! Scissors beats Paper.") {
+                playerScore += 1; //If player wins, player gets a point.
             } else {
                 computerScore += 1; //If computer wins, computer gets a point.
             }
@@ -125,6 +151,29 @@
             }
         }
 
+        //Iterated Game of computers playing for player. To test if my RNG is working properly. Ok, it's not working properly. Expected value should be 33% for all outcomes, but i'm only getting 18.5% for player 1 win, and 45.5% for player loss??
+        function test(numberOfGames) {
+                
+            let playerScore = 0
+            let computerScore = 0
+
+            for (i = 0; i < numberOfGames; i++) {
+                if (playRound(computerPlay(), computerPlay()) === "Tie! Go again!") {
+                    playerScore += 0; //If tied, neither the player nor computer gets a point.
+                } else if (playRound(computerPlay(), computerPlay()) === "You Win! Rock beats Scissors."
+                        || playRound(computerPlay(), computerPlay()) === "You Win! Paper beats Rock."
+                        || playRound(computerPlay(), computerPlay()) === "You Win! Scissors beats Paper.") {
+                    playerScore += 1; //If player wins, player gets a point.
+                } else {
+                    computerScore += 1; //If computer wins, computer gets a point.
+                }
+            }
+
+            let numberOfTies = numberOfGames - (playerScore + computerScore)
+
+            return "Player 1: " + playerScore + ". Player 2: " + computerScore + ". Ties: " + numberOfTies + ".";
+
+        }
     
 
 
@@ -134,4 +183,21 @@
 </body>
 </html>
 
+<!--
+OK, this is my first iteration of this program. I got the basic functionality
+down and did what was required by The Odin Project, but there are a few glaring
+bugs. The biggest is that the RNG isn't working as I thought it would, on two
+fronts.
 
+First, computerPlay() uses getRandomInteger(). I thought I split it 33.3%
+on all fronts, but it seems that I need to go 33.3 for the first, then 50/50. This
+means that getRandomInteger() gets processed again after the first time, even when
+I store that value in another variable. Either that or my math is completely off.
+
+Second, even when I get computerPlay() to output equally, playRound() isn't working
+as intended. There is something very wrong in the logic of how the win/loss is
+distributed. I can think of a fix, but I want to understand WHY it isn't working.
+There are more lessons and projects to move on to, so I will do that for now, but
+I wish to return to this and figure out WHY these two things are behaving this way,
+then proceed to issue a fix.
+-->
