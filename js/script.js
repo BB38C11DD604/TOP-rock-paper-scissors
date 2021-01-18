@@ -1,22 +1,23 @@
-//Randomized computer plays Rock, Paper, or Scissors at equal chance.
+// Randomized computer plays Rock, Paper, or Scissors at equal chance.
 function computerPlay() {
 
+    // This function returns a random number between min and max (inclusive).
     function getRandomInteger(min, max) {
-        return Math.floor(Math.random() * (max - min) +1) + min; //This function returns a random number between min and max (inclusive).
+        return Math.floor(Math.random() * (max - min) +1) + min;
     }
 
     const randomNumber = getRandomInteger(1, 9999)
 
     if (randomNumber <= 3333) {
-        return "Rock" //RNG resulting in 1-3333 (3333 total) results in Rock.;
+        return "Rock" // RNG resulting in 1-3333 (1/3 chance) results in Rock.;
     } else if (randomNumber >= 5000) {
-        return "Paper" //RNG resulting in 6667-9999 (3333 total) results in Paper.
+        return "Paper" // RNG resulting in 5000-9999 (1/2 chance) results in Paper.
     } else {
-        return "Scissors" //RNG resulting in 3334-6666 (3333 total) results in Scissors.
-    }
+        return "Scissors" // Needs to be 50/50 for last two because getRandomInteger() runs again.
+    } // In other words, (1/2 chance given a 2/3 chance === 1/3 chance.)
 }
 
-//Test RNG
+// Test RNG
 function testComputerPlay(numberOfRolls) {
 
     let numberOfRock = 0
@@ -36,136 +37,117 @@ function testComputerPlay(numberOfRolls) {
     return "Rock: " + numberOfRock + ". Paper:" + numberOfPaper + ". Scissors:" + numberOfScissors + ".";
 }
 
+// Initial values and declarations
+let playerSelection;
+let computerSelection;
+let lastRound;
+let playerScore = 0;
+let computerScore = 0;
+
+// New game.
+function newGame() {
+
+    playerScore = 0;
+    computerScore = 0;
+
+    const playerScoreboard = document.querySelector("#player-score");
+    playerScoreboard.textContent = `Player: ${playerScore}`;
+
+    const computerScoreboard = document.querySelector("#computer-score");
+    computerScoreboard.textContent = `Computer: ${computerScore}`;
+
+    const commentary = document.querySelector("#commentary-text");
+    commentary.textContent = "Submit your move to start a game. First to 5 points is the winner!"
+
+    gameEnd.textContent = "";
+    
+    // Button Event Listeners
+    // Each click should play a round and update the game state, thus updating the onscreen text.
+    const buttons = document.querySelectorAll('.rock-paper-scissors-button');
+    buttons.forEach((button) => {
+        button.addEventListener('click', () => {
+            playerSelection = button.id;
+            computerSelection = computerPlay();
+            playRound(playerSelection, computerSelection);
+            gameStateCheck(playerScore, computerScore);
+        });
+    });
+}
+
+// Button Event Listeners
+// Each click should play a round and update the game state, thus updating the onscreen text.
+const buttons = document.querySelectorAll('.rock-paper-scissors-button');
+buttons.forEach((button) => {
+    button.addEventListener('click', () => {
+        playerSelection = button.id;
+        computerSelection = computerPlay();
+        playRound(playerSelection, computerSelection);
+        gameStateCheck(playerScore, computerScore);
+    });
+});
+
 //Plays a single round of Rock Paper Scissors.
 function playRound(playerSelection, computerSelection) {
 
-    playerSelection = String(playerSelection).toLowerCase(); //Make sure that playerSelection is a string then convert to lowercase within this function in order to make it case insensitive.
-    computerSelection = String(computerSelection).toLowerCase(); //Same idea as above.
-
-    if (playerSelection === "rock") {
-        if (computerSelection === "rock") {
-            return "Tie! Go again!" //Rock ties to Rock.
-        } else if (computerSelection === "paper") {
-            return "You Lose! Paper beats Rock." //Rock loses to Paper.
-        } else {
-            return "You Win! Rock beats Scissors." //Rock wins against Scissors.
-        }
-
-    } else if (playerSelection === "paper") {
-        if (computerSelection === "paper") {
-            return "Tie! Go again!" //Paper ties to Paper.
-        } else if (computerSelection === "scissors") {
-            return "You Lose! Scissors beats Paper." //Paper loses to Scissors.
-        } else {
-            return "You Win! Paper beats Rock." //Paper wins against Rock.
-        }
-        
-    } else { //Player selects scissors.
-        if (computerSelection === "scissors") {
-            return "Tie! Go again!" //Scissors ties to Scissors.
-        } else if (computerSelection === "rock") {
-            return "You Lose! Rock beats Scissors." //Scissors loses to Rock.
-        } else {
-            return "You Win! Scissors beats Paper." //Scissors wins againt Paper.
-        }       
+    if (playerSelection === computerSelection) { // Tie. Scores do not change.
+        lastRound = "It's a tie!";
+    } else if (playerSelection === "Rock" && computerSelection === "Paper") { // Computer wins and gains a point.
+        computerScore++;
+        lastRound = "Paper beats Rock. You lose!";
+    } else if (playerSelection === "Rock" && computerSelection === "Scissors") { // Player wins and gains a point.
+        playerScore++;
+        lastRound = "Rock beats Scissors. You win!";
+    } else if (playerSelection === "Paper" && computerSelection === "Scissors") { // Computer wins and gains a point.
+        computerScore++;
+        lastRound = "Scissors beats Paper. You lose!";
+    } else if (playerSelection === "Paper" && computerSelection === "Rock") { // Player wins and gains a point.
+        playerScore++;
+        lastRound = "Paper beats Rock. You win!";
+    } else if (playerSelection === "Scissors" && computerSelection === "Rock") { // Computer wins and gains a point.
+        computerScore++;
+        lastRound = "Rock beats Scissors. You lose!";
+    } else if (playerSelection === "Scissors" && computerSelection === "Paper") { // Player wins and gains a point.
+        playerScore++;
+        lastRound = "Scissors beats Paper. You win!";
     }
-}
-
-//Game of five rounds that keeps score and reports a winner and loser at the end. Not iterated ATM.
-function game(playerSelection1, playerSelection2, playerSelection3, playerSelection4, playerSelection5) {
-
-    let playerScore = 0;
-    let computerScore = 0;
-
-    //Round 1.
     
-    if (playRound(playerSelection1, computerPlay()) === "Tie! Go again!") {
-        playerScore += 0; //If tied, neither the player nor computer gets a point.
-    } else if (playRound(playerSelection1, computerPlay()) === "You Win! Rock beats Scissors."
-            || playRound(playerSelection1, computerPlay()) === "You Win! Paper beats Rock."
-            || playRound(playerSelection1, computerPlay()) === "You Win! Scissors beats Paper.") {
-        playerScore += 1; //If player wins, player gets a point. There needs to be a better way to return win/loss values...
-    } else {
-        computerScore += 1; //If computer wins, computer gets a point.
-    }
-
-    //Round 2.
-    if (playRound(playerSelection2, computerPlay()) === "Tie! Go again!") {
-        playerScore += 0; //If tied, neither the player nor computer gets a point.
-    } else if (playRound(playerSelection2, computerPlay()) === "You Win! Rock beats Scissors."
-            || playRound(playerSelection2, computerPlay()) === "You Win! Paper beats Rock."
-            || playRound(playerSelection2, computerPlay()) === "You Win! Scissors beats Paper.") {
-        playerScore += 1; //If player wins, player gets a point.
-    } else {
-        computerScore += 1; //If computer wins, computer gets a point.
-    }
-
-    //Round 3.
-    if (playRound(playerSelection3, computerPlay()) === "Tie! Go again!") {
-        playerScore += 0; //If tied, neither the player nor computer gets a point.
-    } else if (playRound(playerSelection3, computerPlay()) === "You Win! Rock beats Scissors."
-            || playRound(playerSelection3, computerPlay()) === "You Win! Paper beats Rock."
-            || playRound(playerSelection3, computerPlay()) === "You Win! Scissors beats Paper.") {
-        playerScore += 1; //If player wins, player gets a point.
-    } else {
-        computerScore += 1; //If computer wins, computer gets a point.
-    }
-
-    //Round 4.
-    if (playRound(playerSelection4, computerPlay()) === "Tie! Go again!") {
-        playerScore += 0; //If tied, neither the player nor computer gets a point.
-    } else if (playRound(playerSelection4, computerPlay()) === "You Win! Rock beats Scissors."
-            || playRound(playerSelection4, computerPlay()) === "You Win! Paper beats Rock."
-            || playRound(playerSelection4, computerPlay()) === "You Win! Scissors beats Paper.") {
-        playerScore += 1; //If player wins, player gets a point.
-    } else {
-        computerScore += 1; //If computer wins, computer gets a point.
-    }
-
-    //Round 5.
-    if (playRound(playerSelection5, computerPlay()) === "Tie! Go again!") {
-        playerScore += 0; //If tied, neither the player nor computer gets a point.
-    } else if (playRound(playerSelection5, computerPlay()) === "You Win! Rock beats Scissors."
-            || playRound(playerSelection5, computerPlay()) === "You Win! Paper beats Rock."
-            || playRound(playerSelection5, computerPlay()) === "You Win! Scissors beats Paper.") {
-        playerScore += 1; //If player wins, player gets a point.
-    } else {
-        computerScore += 1; //If computer wins, computer gets a point.
-    }
-
-    //Final Tally of points. No ties have counted, so there must be a winner with an odd number of results recorded.
-    if (playerScore > computerScore) {
-        return "You win, " + playerScore + " to " + computerScore + "!"
-    } else if (playerScore < computerScore) {
-        return "You lose, " + computerScore + " to " + playerScore + "!"
-    } else {
-        return "Tied, " + playerScore + " to " +computerScore + "!"
-    }
 }
 
-//Iterated Game of computers playing for player. To test if my RNG is working properly. Ok, it's not working properly. Expected value should be 33% for all outcomes, but i'm only getting 18.5% for player 1 win, and 45.5% for player loss??
-function test(numberOfGames) {
-        
-    let playerScore = 0
-    let computerScore = 0
+// Text areas
+const playerScoreboard = document.querySelector("#player-score");
+playerScoreboard.textContent = `Player: ${playerScore}`;
 
-    for (i = 0; i < numberOfGames; i++) {
-        if (playRound(computerPlay(), computerPlay()) === "Tie! Go again!") {
-            playerScore += 0; //If tied, neither the player nor computer gets a point.
-        } else if (playRound(computerPlay(), computerPlay()) === "You Win! Rock beats Scissors."
-                || playRound(computerPlay(), computerPlay()) === "You Win! Paper beats Rock."
-                || playRound(computerPlay(), computerPlay()) === "You Win! Scissors beats Paper.") {
-            playerScore += 1; //If player wins, player gets a point.
-        } else {
-            computerScore += 1; //If computer wins, computer gets a point.
+const computerScoreboard = document.querySelector("#computer-score");
+computerScoreboard.textContent = `Computer: ${computerScore}`;
+
+const commentary = document.querySelector("#commentary-text");
+commentary.textContent = "Submit your move to start a game. First to 5 points is the winner!"
+
+const gameEnd = document.querySelector("#game-end-text");
+
+// Checks the state of the game and updates the stuff on the screen.
+function gameStateCheck(playerScore, computerScore) {
+    playerScoreboard.textContent = `Player: ${playerScore}`;
+    computerScoreboard.textContent = `Computer: ${computerScore}`;
+
+    if (playerScore <= 5 && computerScore <= 5) {
+        commentary.textContent = `You played ${playerSelection}, and Computer played ${computerSelection}. ${lastRound}`
+    }
+
+    if (playerScore === 5 || computerScore === 5) {
+        if (playerScore === 5) {
+            gameEnd.textContent = `You are the first to reach 5 points. You are the winner! Click the button below to start a new game.`;
         }
+        if (computerScore === 5) {
+            gameEnd.textContent = `Computer was the first to reach 5 points. You lose! Click the button below to start a new game.`;
+        }
+
+        const newGameButton = document.createElement('button');
+        newGameButton.value = "New Game"
+        newGameButton.addEventListener('click', () => {
+            newGame();
+        });
+        gameEnd.appendChild(newGameButton);
     }
 
-    let numberOfTies = numberOfGames - (playerScore + computerScore)
-
-    return "Player 1: " + playerScore + ". Player 2: " + computerScore + ". Ties: " + numberOfTies + ".";
-
 }
-
-
-

@@ -48,11 +48,17 @@
     width: 515px;
     height: 150px;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
-#commentary-text {
+#commentary-text, #game-end-text {
     margin: 10px 10px;
     text-align: center;
+}
+
+#new-game-button {
+    height: 0px;
+    
 }
